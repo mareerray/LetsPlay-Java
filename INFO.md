@@ -110,6 +110,13 @@ If visible, click the green “run” icon or right-click the file and choose Ru
 
 If not available, use the command-line method above.
 
+## Summary Table
+| Service	     | Purpose	  | Default Port | Where to set |
+|--------------|-----------|-------| -------------|
+| MongoDB      | Database	 | 27017	| application.properties|
+| Spring Boot  | 	REST API web server | 	8080 |	application.properties |
+
+
 
 ## Next: Build Features Step-By-Step
 - Define simple User and Product Java classes.
