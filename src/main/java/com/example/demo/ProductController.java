@@ -9,7 +9,7 @@
  @RequestMapping("/products")
  public class ProductController {
 
-     @AutoWired
+     @Autowired
      private ProductRepository productRepository;
 
      // GET all products (public)

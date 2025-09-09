@@ -121,7 +121,7 @@ If not available, use the command-line method above.
 ## Next: Build Features Step-By-Step
 - Define simple User and Product Java classes. ✅
 
-- Add simple REST API methods (start with GET or POST).
+- Add simple REST API methods (start with GET or POST). ✅
 
 - Test your app using Postman or your browser.
 
