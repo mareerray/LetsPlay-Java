@@ -20,7 +20,7 @@
 
      // GET single product (public)
      @GetMapping("/{id}")
-     public Optional<product> getProductById(@PathVariable String id) {
+     public Optional<Product> getProductById(@PathVariable String id) {
          return productRepository.findById(id);
      }
 
@@ -39,13 +39,13 @@
 
      // DELETE product
      @DeleteMapping("/{id}")
-    public Product deleteProduct(@PathVariable String id) {
-         return productRepository.deleteById(id);
+    public void deleteProduct(@PathVariable String id) {
+         productRepository.deleteById(id);
      }
 
      // GET product by user id
      @GetMapping("/user/{userId}")
-     public List<product> getProductsByUserId(@PathVariable String userId) {
+     public List<Product> getProductsByUserId(@PathVariable String userId) {
          return productRepository.findByUserId(userId);
      }
  }

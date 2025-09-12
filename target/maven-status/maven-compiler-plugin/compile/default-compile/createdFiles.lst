@@ -1,2 +1,14 @@
+com/example/demo/UserRepository.class
+com/example/demo/Product.class
+com/example/demo/UserDTO.class
+com/example/demo/UserController.class
+com/example/demo/UserRegistrationDTO.class
+com/example/demo/SecurityConfig.class
+com/example/demo/UserLoginDTO.class
+com/example/demo/UserController$LoginResponseDTO.class
+com/example/demo/JwtAuthenticationFilter.class
 com/example/demo/HelloController.class
 com/example/demo/DemoApplication.class
+com/example/demo/User.class
+com/example/demo/ProductRepository.class
+com/example/demo/ProductController.class
