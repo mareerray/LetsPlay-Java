@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        System.out.println("[DEBUG] JwtAuthenticationFilter: Filtering " + request.getRequestURI());
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
@@ -46,7 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return "/users/login".equals(request.getRequestURI());
+        String path = request.getRequestURI();
+        boolean result = path.startsWith("/users/login") || path.startsWith("/users/register");
+        System.out.println("[DEBUG] shouldNotFilter? " + path + " -> " + result);
+        return result;
     }
-
 }

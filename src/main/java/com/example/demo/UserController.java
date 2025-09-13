@@ -40,6 +40,9 @@ public class UserController {
     // REGISTER endpoint
     @PostMapping("/register")
     public String registerUser(@Valid @RequestBody UserRegistrationDTO userDTO) {
+        if (userRepository.findByEmail(userDTO.getEmail()) != null) {
+            return "Email already exists!";
+        }
         // Passwords are always hashed before saving.
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hashedPassword = encoder.encode(userDTO.getPassword());
@@ -57,6 +60,7 @@ public class UserController {
     // LOGIN endpoint
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody UserLoginDTO loginDTO) {
+        System.out.println("[DEBUG] Entered UserController.login for " + loginDTO.getEmail());
         User user = userRepository.findByEmail(loginDTO.getEmail());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
