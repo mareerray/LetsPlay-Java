@@ -1,6 +1,7 @@
  package com.example.demo;
 
  import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.http.ResponseEntity;
  import org.springframework.web.bind.annotation.*;
  import java.util.List;
  import java.util.Optional;
@@ -39,8 +40,9 @@
 
      // DELETE product
      @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable String id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable String id) {
          productRepository.deleteById(id);
+         return ResponseEntity.ok("Product deleted");
      }
 
      // GET product by user id
