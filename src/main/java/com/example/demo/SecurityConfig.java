@@ -26,7 +26,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
-                        //.requestMatchers("/users/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/users/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtSecret), UsernamePasswordAuthenticationFilter.class);
