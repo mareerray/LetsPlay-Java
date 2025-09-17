@@ -5,6 +5,7 @@
  import org.springframework.web.bind.annotation.*;
  import java.util.List;
  import java.util.Optional;
+ import org.springframework.security.core.Authentication;
 
  @RestController
  @RequestMapping("/products")
@@ -26,10 +27,14 @@
      }
 
      // CREATE product
-     @PostMapping
-     public Product createProduct(@RequestBody Product product) {
-         return productRepository.save(product);
+     @PostMapping("/products")
+     public ResponseEntity<Product> createProduct(@RequestBody Product product, Authentication auth) {
+         String userId = /* extract from JWT claims or lookup by email */;
+         product.setUserId(userId);
+         Product saved = productRepository.save(product);
+         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
      }
+
 
      // UPDATE product
      @PutMapping("/{id}")

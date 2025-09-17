@@ -1,6 +1,8 @@
 package com.example.demo;
 import com.example.demo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +43,7 @@ public class UserController {
         public String getMessage() { return message; }
     }
 
-    // REGISTER endpoint
+    // REGISTER endpoint ===================================================================== //
     @PostMapping("/register")
     public String registerUser(@Valid @RequestBody UserRegistrationDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
@@ -55,13 +57,13 @@ public class UserController {
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(hashedPassword);
-        user.setRole("user");
+        user.setRole("user");  // Always force "user" here
 
         userRepository.save(user);
         return "Registration successful!";
     }
 
-    // LOGIN endpoint
+    // LOGIN endpoint ===================================================================== //
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody UserLoginDTO loginDTO) {
         System.out.println("[DEBUG] Entered UserController.login for " + loginDTO.getEmail());
@@ -89,8 +91,60 @@ public class UserController {
 
         return ResponseEntity.ok(new LoginResponseDTO(jwt, "Login successful!"));
     }
+// -------------------------- Role: User ------------------------------------------------- //
+    // ---- GET own profile ---- //
+    @GetMapping("/me")
+    public UserDTO getMyProfile(Authentication auth) {
+        String userEmail = auth.getName();
+        User user = userRepository.findByEmail(userEmail);
+        return toDTO(user);
+    }
 
-    // GET all users (use DTO, no passwords)
+    // ---- UPDATE own profile ---- //
+    @PutMapping("/me")
+    public ResponseEntity<UserDTO> updateMyProfile(
+            @Valid @RequestBody UserRegistrationDTO userDTO,
+            Authentication auth) {
+
+        // Get email from JWT to ensure only the user can update their data.
+        String userEmail = auth.getName(); // usually the username/email
+        User user = userRepository.findByEmail(userEmail);
+
+        if (user == null) {
+            // User is not allowed to update anyone else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+
+        // Only update password if present and not empty
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            user.setPassword(encoder.encode(userDTO.getPassword()));
+        }
+
+        user = userRepository.save(user);
+        return ResponseEntity.ok(toDTO(user));
+    }
+
+    // ---- DELETE own profile ---- //
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteOwnProfile(Authentication auth) {
+        String userEmail = auth.getName();
+        User user = userRepository.findByEmail(userEmail);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        userRepository.deleteById(user.getId());
+        return ResponseEntity.ok("User deleted"); // return 200 Ok
+        // or return ResponseEntity.noContent().build(); // return 204 No Content
+    }
+
+// -------------------------- Role: Admin ONLY ------------------------------------------------- //
+    // **** GET all users **** //
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -98,17 +152,20 @@ public class UserController {
         // returning a list of DTOs from a list of users
     }
 
-    // GET single user by id with 404 and DTO
+    // **** GET user by id **** //
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
         Optional<User> userOpt = userRepository.findById(id);
-        return userOpt.map(user -> ResponseEntity.ok(toDTO(user)))
-                .orElse(ResponseEntity.notFound().build());
+        return userOpt.map( u -> ResponseEntity.ok(toDTO(u)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // CREATE user (no duplicate email, password hashing, and return 409 if conflict or 201 if created)
+    // **** CREATE user **** //
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserRegistrationDTO userDTO) {
+    public ResponseEntity<UserDTO> createUser(
+            @Valid @RequestBody UserRegistrationDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -120,26 +177,23 @@ public class UserController {
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(hashedPassword);
-        user.setRole("user");
+
+        // Only allow specific roles for security
+        if (!"admin".equals(userDTO.getRole()) && !"user".equals(userDTO.getRole())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        user.setRole(userDTO.getRole());
+
         user = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(user));
     }
 
-    // UPDATE user by id (404 if not exist, update fields)
+    // **** UPDATE user by id (404 if not exist, update fields) **** //
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable String id,
-            @Valid @RequestBody UserRegistrationDTO userDTO,
-            Authentication auth) {
-
-        // Get email from JWT to ensure only the user can update their data.
-        String userEmail = auth.getName(); // usually the username/email
-        User authenticatedUser = userRepository.findByEmail(userEmail);
-
-        if (authenticatedUser == null || !authenticatedUser.getId().equals(id)) {
-            // User is not allowed to update anyone else
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+            @Valid @RequestBody UserRegistrationDTO userDTO) {
 
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
@@ -160,23 +214,20 @@ public class UserController {
         return ResponseEntity.ok(toDTO(user));
     }
 
-    // DELETE user by id (404 if not exist)
+    // **** DELETE user by id (404 if not exist) **** //
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id, Authentication auth) {
+    public ResponseEntity<String> deleteUser(@PathVariable String id) {
         if (!userRepository.existsById(id)) {
             return ResponseEntity.notFound().build(); // return 404 if id not found
         }
-        String userEmail = auth.getName();
-        User authenticatedUser = userRepository.findByEmail(userEmail);
 
-        if (authenticatedUser == null || !authenticatedUser.getId().equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();  // return 403 if not the owner
-        }
         userRepository.deleteById(id);
         return ResponseEntity.ok("User deleted"); // return 200 Ok
         // or return ResponseEntity.noContent().build(); // return 204 No Content
     }
 
+    // -------------------------- Helper function ------------------------------------------------- //
     // Helper method to convert entity to DTO
     private UserDTO toDTO (User user) {
         UserDTO dto = new UserDTO();

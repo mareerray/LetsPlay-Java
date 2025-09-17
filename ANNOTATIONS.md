@@ -1,26 +1,30 @@
 # Annotation
 
-| Annotation| Purpose/Effect                                                             | 	Example                                        |
-| ---------- |----------------------------------------------------------------------------|-------------------------------------------------|
-|@RestController| 	Marks class as REST API, auto-converts response to JSON	                  | @RestController public class UserController { } |
-|@RequestMapping| 	Maps base URL for API endpoints	                                          | @RequestMapping("/users")                       |
-|@Autowired| 	Injects Spring-managed bean automatically| 	@Autowired UserRepository repo;                |
-|@Value |	Injects config value from application.properties|	@Value("${jwt.secret}") String secret;|
-|@PostMapping|	Maps HTTP POST requests to a specific method |	@PostMapping("/login")|
-|@GetMapping |	Maps HTTP GET requests to a method |	@GetMapping("/profile")|
-|@PutMapping |	Maps HTTP PUT requests to a method |	@PutMapping("/edit")|
-|@DeleteMapping |	Maps HTTP DELETE requests to a method|	@DeleteMapping("/delete")|
-|@RequestBody|	Maps incoming HTTP body (JSON) to object|	@RequestBody UserDTO dto|
-|@Valid |	Applies bean validation to DTO or parameters|	@Valid @RequestBody UserDTO dto |
-|@Email |	Validates field contains a valid email format|	@Email private String email; |
-|@NotBlank	|Validates field is not null, empty, or whitespace only|	@NotBlank private String password;|
-|@Size|	Restricts size/length of string, collection, array|	@Size(min=8, max=20) private String password;|
-|@Id	|Marks field as entity’s primary key|	@Id private Long id;|
-|@Configuration |	Marks class as source of bean definitions/config |	@Configuration public class AppConfig { }|
-|@EnableWebSecurity	|Enables Spring Security for web applications|	@EnableWebSecurity public class SecurityConfig { }|
-|@Override |	Indicates a method overrides superclass method|	@Override public void run() { } |
-|@SpringBootApplication |	Main entry annotation; enables auto-configuration, etc.|	@SpringBootApplication public class DemoApp { }|
-
+| Annotation| Purpose/Effect                                                             | 	Example                                                                                                 |
+| ---------- |----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+|@RestController| 	Marks class as REST API, auto-converts response to JSON	                  | @RestController public class UserController { }                                                          |
+|@RequestMapping| 	Maps base URL for API endpoints	                                          | @RequestMapping("/users")                                                                                |
+|@Autowired| 	Injects Spring-managed bean automatically| 	@Autowired UserRepository repo;                                                                         |
+|@Value |	Injects config value from application.properties| 	@Value("${jwt.secret}") String secret;                                                                  |
+|@PostMapping|	Maps HTTP POST requests to a specific method | 	@PostMapping("/login")                                                                                  |
+|@GetMapping |	Maps HTTP GET requests to a method | 	@GetMapping("/profile")                                                                                 |
+|@PutMapping |	Maps HTTP PUT requests to a method | 	@PutMapping("/edit")                                                                                    |
+|@DeleteMapping |	Maps HTTP DELETE requests to a method| 	@DeleteMapping("/delete")                                                                               |
+|@RequestBody|	Maps incoming HTTP body (JSON) to object| 	@RequestBody UserDTO dto                                                                                |
+|@Valid |	Applies bean validation to DTO or parameters| 	@Valid @RequestBody UserDTO dto                                                                         |
+|@Email |	Validates field contains a valid email format| 	@Email private String email;                                                                            |
+|@NotBlank	|Validates field is not null, empty, or whitespace only| 	@NotBlank private String password;                                                                      |
+|@Size|	Restricts size/length of string, collection, array| 	@Size(min=8, max=20) private String password;                                                           |
+|@Id	|Marks field as entity’s primary key| 	@Id private Long id;                                                                                    |
+|@Configuration |	Marks class as source of bean definitions/config | 	@Configuration public class AppConfig { }                                                               |
+|@EnableWebSecurity	|Enables Spring Security for web applications| 	@EnableWebSecurity public class SecurityConfig { }                                                      |
+|@Override |	Indicates a method overrides superclass method| 	@Override public void run() { }                                                                         |
+|@SpringBootApplication |	Main entry annotation; enables auto-configuration, etc.| 	@SpringBootApplication public class DemoApp { }                                                         |
+ |@EnableMethodSecurity | Enables method-level security annotations in your app | On your @Configuration class: @EnableMethodSecurity                                                      |
+| @PreAuthorize	| Checks a SpEL expression before method execution (deny access if not met) | 	@PreAuthorize("hasRole('ADMIN')") Method can only be called if the user has role ADMIN.                 |
+| @PostAuthorize |	Checks a SpEL expression after method execution (can block access to result) | 	@PostAuthorize("returnObject.owner == authentication.name") (Allow if returned object is owned by user) |
+ | @Secured	| Simpler check:Only allows users with any of the listed roles; does not use SpEL | 	@Secured("ROLE_ADMIN")                                                                                  |
+User must have "ROLE_ADMIN"
 ### Quick Note
 - Validation annotations (@Email, @NotBlank, @Size) are typically placed on fields in DTO/model classes for automatic request validation.
 
