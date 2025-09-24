@@ -1,26 +1,13 @@
+// For Product Output (API Response)
+
 package com.example.demo;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+public class ProductDTO {
 
-@Document(collection = "products")
-public class Product {
-    @Id
     private String id;
-
-    @NotNull @Size(min = 2, max = 64)
     private String name;
-
-    @Size(max = 225)
     private String description;
-
-    @NotNull @DecimalMin("0.0")
     private Double price;
-
-    @NotNull
     private String userId;  // ID of the user who owns the product
 
     // Getters
@@ -58,8 +45,3 @@ public class Product {
     }
 
 }
-
-/*
-The @Id Annotation
-Required for MongoDB: It marks the primary key field for your user documents.
- */

@@ -1,22 +1,18 @@
 package com.example.demo;
-import com.example.demo.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.core.Authentication;
 
 
@@ -144,7 +140,7 @@ public class UserController {
 
 // -------------------------- Role: Admin ONLY ------------------------------------------------- //
     // **** GET all users **** //
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @GetMapping
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -153,7 +149,7 @@ public class UserController {
     }
 
     // **** GET user by id **** //
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
         Optional<User> userOpt = userRepository.findById(id);
@@ -162,7 +158,7 @@ public class UserController {
     }
 
     // **** CREATE user **** //
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(
             @Valid @RequestBody UserRegistrationDTO userDTO) {
@@ -189,7 +185,7 @@ public class UserController {
     }
 
     // **** UPDATE user by id (404 if not exist, update fields) **** //
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable String id,
@@ -215,7 +211,7 @@ public class UserController {
     }
 
     // **** DELETE user by id (404 if not exist) **** //
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable String id) {
         if (!userRepository.existsById(id)) {

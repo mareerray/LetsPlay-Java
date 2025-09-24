@@ -1,8 +1,11 @@
+/Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/AdminBootstrap.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/DemoApplication.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/HelloController.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/JwtAuthenticationFilter.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/Product.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/ProductController.java
+/Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/ProductDTO.java
+/Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/ProductInputDTO.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/ProductRepository.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/SecurityConfig.java
 /Users/mayuree.reunsati/Desktop/LetsPlay-Java/src/main/java/com/example/demo/User.java

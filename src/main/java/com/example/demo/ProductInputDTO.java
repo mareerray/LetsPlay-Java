@@ -1,13 +1,14 @@
-package com.example.demo;
+// For Product Input (Creating & updating products)
 
+package com.example.demo;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Document(collection = "products")
-public class Product {
+public class ProductInputDTO {
+
     @Id
     private String id;
 
@@ -36,9 +37,7 @@ public class Product {
     public Double getPrice () {
         return price;
     }
-    public String getUserId () {
-        return userId;
-    }
+    public String getUserId() { return userId; }
 
     // Setters
     public void setId (String id) {
@@ -53,13 +52,5 @@ public class Product {
     public void setPrice (Double price) {
         this.price = price;
     }
-    public void setUserId (String userId) {
-        this.userId = userId;
-    }
-
+    public void setUserId (String userId) { this.userId = userId; }
 }
-
-/*
-The @Id Annotation
-Required for MongoDB: It marks the primary key field for your user documents.
- */
