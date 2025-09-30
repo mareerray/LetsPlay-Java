@@ -1,0 +1,57 @@
+[
+    {
+        "name": "Coffee Mug XL",
+        "description": "A larger stylish mug",
+        "price": 7.99,
+    },
+    {
+        "name": "Digital Food Scale",
+        "description": "Precise weight measurement for ingredients",
+        "price": 17.99
+    },
+    {
+        "name": "Electric Milk Frother",
+        "description": "Quickly froths milk for coffee and lattes",
+        "price": 19.50
+    },
+    {
+        "name": "Multi-Function Vegetable Slicer",
+        "description": "Slices and juliennes veggies fast",
+        "price": 24.99
+    },
+    {
+        "name": "Stainless Steel Garlic Press",
+        "description": "Effortlessly crushes garlic cloves",
+        "price": 9.99
+    },
+    {
+        "name": "Handheld Citrus Juicer",
+        "description": "Extracts juice from lemons and limes",
+        "price": 8.50
+    },
+    {
+        "name": "Collapsible Silicone Colander",
+        "description": "Strains pasta and rinses produce",
+        "price": 12.99
+    },
+    {
+        "name": "Magnetic Knife Holder Strip",
+        "description": "Organizes kitchen knives safely",
+        "price": 15.99
+    },
+    {
+        "name": "Electric Pepper Grinder",
+        "description": "Grinds pepper at the touch of a button",
+        "price": 18.99
+    },
+    {
+        "name": "Reusable Food Storage Bags",
+        "description": "Keeps food fresh and reduces waste",
+        "price": 13.50
+    },
+    {
+        "name": "Non-Stick Pancake Turner",
+        "description": "Flips pancakes and delicate foods easily",
+        "price": 6.99
+    }
+]
