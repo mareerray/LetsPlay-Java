@@ -1,14 +1,12 @@
  package com.gritlab.letsplay.controller;
 
+ import com.gritlab.letsplay.exception.GlobalExceptionHandler.*;
  import com.gritlab.letsplay.model.*;
  import com.gritlab.letsplay.repository.ProductRepository;
  import com.gritlab.letsplay.repository.UserRepository;
  import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.http.HttpStatus;
- import org.springframework.http.ResponseEntity;
  import org.springframework.web.bind.annotation.*;
  import java.util.List;
- import java.util.Optional;
  import org.springframework.security.core.Authentication;
  import javax.validation.Valid;
 
@@ -31,24 +29,24 @@
 
      // GET single product (public)
      @GetMapping("/{id}")
-     public ResponseEntity<ProductDTO> getProductById(@PathVariable String id) {
-         Optional<Product> productOpt = productRepository.findById(id);
-         return productOpt.map(p -> ResponseEntity.ok(toDTO(p))).orElseGet(() -> ResponseEntity.notFound().build());
+     public ProductDTO getProductById(@PathVariable String id) {
+         Product product = productRepository.findById(id)
+                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+         return toDTO(product);
      }
 
      // -------------------------- Need auth ------------------------------------------------- //
      // === CREATE product === //
      @PostMapping
-     public ResponseEntity<ProductDTO> createProduct(
+     public ProductDTO createProduct(
              @Valid @RequestBody ProductInputDTO input,
              Authentication auth) {
          // Get email from JWT to ensure only the authenticated user can create product.
          String userEmail = auth.getName(); // usually the username/email
          User user = userRepository.findByEmail(userEmail);
 
-
          if (user == null) {
-             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+             throw new UnauthorizedException("User not authenticated.");
          }
          String userId = user.getId();
 
@@ -59,94 +57,81 @@
          product.setUserId(userId);
 
          Product saved = productRepository.save(product);
-         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(saved));
+         return toDTO(saved);
      }
 
 
      // === UPDATE product (ADMIN & product owner) === //
      @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(
+    public ProductDTO updateProduct(
             @PathVariable String id,
             @Valid @RequestBody ProductInputDTO input,
             Authentication auth) {
 
-         Optional<Product> optionalProduct = productRepository.findById(id);
-
-         // Checks for missing product and returns HTTP 404 if not found.
-         if (optionalProduct.isEmpty()) {
-             return ResponseEntity.notFound().build();
-         }
-
-         Product product = optionalProduct.get();
+         Product product = productRepository.findById(id)
+                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
          User user = userRepository.findByEmail(userEmail);
 
          if (user == null) {
-             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+             throw new UnauthorizedException("User not authenticated.");
          }
 
          // Allows the operation only if the authenticated user
          // is either the owner of the product or an admin.
          if (!product.getUserId().equals(user.getId()) && !"admin".equalsIgnoreCase(user.getRole())) {
-             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+             throw new ForbiddenException("You don't have permission to modify this product.");
          }
 
          product.setName(input.getName());
          product.setDescription(input.getDescription());
          product.setPrice(input.getPrice());
          Product updatedProduct = productRepository.save(product);
-         return ResponseEntity.ok(toDTO(updatedProduct));
+         return toDTO(updatedProduct);
      }
 
 
      // === DELETE product (ADMIN & product owner) === //
      @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(
+    public String deleteProduct(
             @PathVariable String id,
             Authentication auth) {
-         Optional<Product> optionalProduct = productRepository.findById(id);
-
-         // Checks for missing product and returns HTTP 404 if not found.
-         if (optionalProduct.isEmpty()) {
-             return ResponseEntity.notFound().build();
-         }
-
-         Product product = optionalProduct.get();
+         Product product = productRepository.findById(id)
+                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
          User user = userRepository.findByEmail(userEmail);
 
          if (user == null) {
-             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+             throw new UnauthorizedException("User not authenticated.");
          }
 
          // Allows the operation only if the authenticated user
          // is either the owner of the product or an admin.
          if (!product.getUserId().equals(user.getId()) && !"admin".equalsIgnoreCase(user.getRole())) {
-             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+             throw new ForbiddenException("You don't have permission to delete this product.");
          }
 
          productRepository.delete(product);
-         return ResponseEntity.ok("Product deleted");
+         return "Product deleted";
      }
 
      // === GET product by user id === //
      @GetMapping("/me")
-     public ResponseEntity<List<ProductDTO>> getMyProducts(Authentication auth) {
+     public List<ProductDTO> getMyProducts(Authentication auth) {
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
          User user = userRepository.findByEmail(userEmail);
 
          if (user == null) {
-             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+             throw new UnauthorizedException("User not authenticated.");
          }
 
          List<Product> products = productRepository.findByUserId(user.getId());
-         List<ProductDTO> productDTOList = products.stream().map(this::toDTO).toList();
-         return ResponseEntity.ok(productDTOList);
+         return  products.stream().map(this::toDTO).toList();
      }
 
      // -------------------------- Helper function ------------------------------------------------- //

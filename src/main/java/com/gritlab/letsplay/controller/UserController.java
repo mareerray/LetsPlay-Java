@@ -1,5 +1,7 @@
 package com.gritlab.letsplay.controller;
 
+import com.gritlab.letsplay.exception.GlobalExceptionHandler.*;
+import org.springframework.security.authentication.BadCredentialsException;
 import com.gritlab.letsplay.model.*;
 import com.gritlab.letsplay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 
 
@@ -45,7 +46,7 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(@Valid @RequestBody UserRegistrationDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-            return "Email already exists!";
+            throw new UserAlreadyExistsException();
         }
         // Passwords are always hashed before saving.
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -67,13 +68,11 @@ public class UserController {
         System.out.println("[DEBUG] Entered UserController.login for " + loginDTO.getEmail());
         User user = userRepository.findByEmail(loginDTO.getEmail());
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponseDTO(null, "Invalid credentials!"));
+            throw new BadCredentialsException("Invalid authentication credentials.");
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (!encoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponseDTO(null, "Invalid credentials!"));
+            throw new BadCredentialsException("Invalid authentication credentials.");
         }
 
         // Token details
@@ -100,7 +99,7 @@ public class UserController {
 
     // ---- UPDATE own profile ---- //
     @PutMapping("/me")
-    public ResponseEntity<UserDTO> updateMyProfile(
+    public UserDTO updateMyProfile(
             @Valid @RequestBody UserRegistrationDTO userDTO,
             Authentication auth) {
 
@@ -110,7 +109,7 @@ public class UserController {
 
         if (user == null) {
             // User is not allowed to update anyone else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new ResourceNotFoundException("User profile not found for email: " + userEmail);
         }
 
         user.setName(userDTO.getName());
@@ -123,21 +122,20 @@ public class UserController {
         }
 
         user = userRepository.save(user);
-        return ResponseEntity.ok(toDTO(user));
+        return toDTO(user);
     }
 
     // ---- DELETE own profile ---- //
     @DeleteMapping("/me")
-    public ResponseEntity<String> deleteOwnProfile(Authentication auth) {
+    public String deleteOwnProfile(Authentication auth) {
         String userEmail = auth.getName();
         User user = userRepository.findByEmail(userEmail);
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new ResourceNotFoundException("User profile not found for email: " + userEmail);
         }
         userRepository.deleteById(user.getId());
-        return ResponseEntity.ok("User deleted"); // return 200 Ok
-        // or return ResponseEntity.noContent().build(); // return 204 No Content
+        return "User deleted";
     }
 
 // -------------------------- Role: Admin ONLY ------------------------------------------------- //
@@ -153,19 +151,19 @@ public class UserController {
     // **** GET user by id **** //
     @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
+    public UserDTO getUser(@PathVariable String id) {
         Optional<User> userOpt = userRepository.findById(id);
-        return userOpt.map( u -> ResponseEntity.ok(toDTO(u)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return userOpt.map(this::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
     // **** CREATE user **** //
     @PreAuthorize("hasRole('admin')")
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(
+    public UserDTO createUser(
             @Valid @RequestBody UserRegistrationDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new UserAlreadyExistsException();
         }
         // Passwords are always hashed before saving.
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -178,27 +176,25 @@ public class UserController {
 
         // Only allow specific roles for security
         if (!"admin".equals(userDTO.getRole()) && !"user".equals(userDTO.getRole())) {
-            return ResponseEntity.badRequest().body(null);
+            throw new InvalidRoleException("Role must be either 'admin' or 'user'.");
         }
         user.setRole(userDTO.getRole());
 
         user = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(user));
+        return toDTO(user);
     }
 
     // **** UPDATE user by id (404 if not exist, update fields) **** //
     @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(
+    public UserDTO updateUser(
             @PathVariable String id,
             @Valid @RequestBody UserRegistrationDTO userDTO) {
 
         Optional<User> userOpt = userRepository.findById(id);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        User user = userOpt
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        User user = userOpt.get();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
 
@@ -209,20 +205,19 @@ public class UserController {
         }
 
         user = userRepository.save(user);
-        return ResponseEntity.ok(toDTO(user));
+        return toDTO(user);
     }
 
     // **** DELETE user by id (404 if not exist) **** //
     @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+    public String deleteUser(@PathVariable String id) {
         if (!userRepository.existsById(id)) {
-            return ResponseEntity.notFound().build(); // return 404 if id not found
+            throw new ResourceNotFoundException("User not found with id: " + id);
         }
 
         userRepository.deleteById(id);
-        return ResponseEntity.ok("User deleted"); // return 200 Ok
-        // or return ResponseEntity.noContent().build(); // return 204 No Content
+        return "User deleted";
     }
 
     // -------------------------- Helper function ------------------------------------------------- //

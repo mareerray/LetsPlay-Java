@@ -3,8 +3,8 @@
 | .................     | .................         | ...............               | .............   |
 | Users CRUD            | .................         | ...............               | .............   |
 | .................     | .................         | ...............               | .............   |
-| POST /register        | Register                  | permit ALL (public)           | registerUser    |
-| POST /login           | Log-in                    | permit ALL (public)           | login           |
+| POST /users/register  | Register                  | permit ALL (public)           | registerUser    |
+| POST /users/login     | Log-in                    | permit ALL (public)           | login           |
 | .................     | .................         | ...............               | .............   |
 | GET /users            | Get all users             | ADMIN                         | getAllUser      |
 | GET /users/{id}       | Get a single user         | ADMIN                         | getUser         |

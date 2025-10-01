@@ -2,7 +2,7 @@
     {
         "name": "Coffee Mug XL",
         "description": "A larger stylish mug",
-        "price": 7.99,
+        "price": 7.99
     },
     {
         "name": "Digital Food Scale",

@@ -57,3 +57,11 @@ This application will feature user and product entities, provide RESTful CRUD en
 - Use Spring Initializer to bootstrap the project.
 
 - Reference Github REST documentation for API conventions.
+
+## Security Notice – HTTPS Enforcement
+
+This application only supports HTTPS connections out of the box, configured via the `application.properties`:
+- Keystore: `src/main/resources/keystore.p12`
+- SSL is enabled: `server.ssl.enabled=true`
+
+Use a valid, trusted certificate for any public deployment.  

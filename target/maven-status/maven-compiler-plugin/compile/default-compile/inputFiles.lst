@@ -1,8 +1,8 @@
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/LetsPlayApplication.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/config/SecurityConfig.java
-/Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/controller/HelloController.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/controller/ProductController.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/controller/UserController.java
+/Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/exception/GlobalExceptionHandler.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/Product.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/ProductDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/ProductInputDTO.java
