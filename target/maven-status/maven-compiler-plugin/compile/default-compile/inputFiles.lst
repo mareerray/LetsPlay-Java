@@ -6,6 +6,7 @@
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/Product.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/ProductDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/ProductInputDTO.java
+/Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/ProductUpdateDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/User.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/UserDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/UserLoginDTO.java

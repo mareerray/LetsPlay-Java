@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -109,16 +109,37 @@ public class UserController {
 
         if (user == null) {
             // User is not allowed to update anyone else
-            throw new ResourceNotFoundException("User profile not found for email: " + userEmail);
+            throw new ResourceNotFoundException("User not found");
         }
 
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
+        boolean updated = false;
+
+        // Only update name if provided
+        if (userDTO.getName() != null && !userDTO.getName().isEmpty()) {
+            user.setName(userDTO.getName());
+            updated = true;
+        }
+
+        // Never change email through profile update (for safety)
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email update is not allowed.");
+        }
 
         // Only update password if present and not empty
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             user.setPassword(encoder.encode(userDTO.getPassword()));
+            updated = true;
+        }
+
+        // Forbid role change
+        if (userDTO.getRole() != null && !userDTO.getRole().isEmpty()) {
+            throw new IllegalArgumentException("Role update is not allowed.");
+        }
+
+        if (!updated) {
+            // No update fields provided
+            throw new IllegalArgumentException("No fields provided to update.");
         }
 
         user = userRepository.save(user);
@@ -189,19 +210,36 @@ public class UserController {
     @PutMapping("/{id}")
     public UserDTO updateUser(
             @PathVariable String id,
-            @Valid @RequestBody UserRegistrationDTO userDTO) {
+            @RequestBody UserDTO userDTO) {
 
         Optional<User> userOpt = userRepository.findById(id);
         User user = userOpt
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found "));
 
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
+        boolean updated = false;
 
-        // Only update password if present and not empty
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            user.setPassword(encoder.encode(userDTO.getPassword()));
+        // Only update name if provided
+        if (userDTO.getName() != null && !userDTO.getName().isEmpty()) {
+            user.setName(userDTO.getName());
+            updated = true;
+        }
+
+        // Never change email through profile update (for safety)
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email update is not allowed.");
+        }
+
+        // Allow admin to update role, but only to 'user' or 'admin'
+        if (userDTO.getRole() != null && !userDTO.getRole().isEmpty()) {
+            if (!userDTO.getRole().equals("user") && !userDTO.getRole().equals("admin")) {
+                throw new IllegalArgumentException("Role must be either 'admin' or 'user'.");
+            }
+            user.setRole(userDTO.getRole());
+            updated = true;
+        }
+
+        if (!updated) {
+            throw new IllegalArgumentException("No fields provided to update.");
         }
 
         user = userRepository.save(user);

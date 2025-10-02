@@ -4,11 +4,11 @@ package com.gritlab.letsplay.model;
 
 public class ProductDTO {
 
-    private String id;
+    private String id;  // MongoDB auto-generates this
     private String name;
     private String description;
     private Double price;
-    private String userId;  // ID of the user who owns the product
+    private String userId;  // ID of the owner
 
     // Getters
     public String getId () {
@@ -43,5 +43,4 @@ public class ProductDTO {
     public void setUserId (String userId) {
         this.userId = userId;
     }
-
 }

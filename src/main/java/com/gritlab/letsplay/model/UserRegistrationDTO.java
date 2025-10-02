@@ -2,10 +2,11 @@
 // (includes password, validation annotations, usually omits id/role).
 package com.gritlab.letsplay.model;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 public class UserRegistrationDTO {
     @NotBlank
+    @Pattern(regexp = ".*(?:[a-zA-Z].*){3,}.*", message = "Name must contain at least 3 letters.")
     private String name;
 
     @Email

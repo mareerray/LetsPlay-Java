@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -60,12 +61,6 @@ public class GlobalExceptionHandler {
                 .body(Map.of("status", "error", "message", ex.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleOther(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("status", "error", "message", "We're experiencing technical difficulties. Please try again later."));
-    }
-
     @ExceptionHandler(InvalidRoleException.class)
     public ResponseEntity<Object> handleInvalidRole(InvalidRoleException ex) {
         return ResponseEntity.badRequest()
@@ -84,6 +79,19 @@ public class GlobalExceptionHandler {
                 .body(Map.of("status", "error", "message", ex.getMessage()));
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleNotReadable(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "status", "error",
+                "message", "Malformed or missing request body"
+        ));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleOther(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("status", "error", "message", "We're experiencing technical difficulties. Please try again later."));
+    }
 
     public static class ResourceNotFoundException extends RuntimeException {
         public ResourceNotFoundException(String message) {
@@ -106,10 +114,9 @@ public class GlobalExceptionHandler {
     public static class UnauthorizedException extends RuntimeException {
         public UnauthorizedException(String message) { super(message); }
     }
+
     public static class ForbiddenException extends RuntimeException {
         public ForbiddenException(String message) { super(message); }
     }
-
-
 }
 

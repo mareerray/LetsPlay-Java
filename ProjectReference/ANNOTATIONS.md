@@ -24,7 +24,16 @@
 | @PreAuthorize	| Checks a SpEL expression before method execution (deny access if not met) | 	@PreAuthorize("hasRole('ADMIN')") Method can only be called if the user has role ADMIN.                 |
 | @PostAuthorize |	Checks a SpEL expression after method execution (can block access to result) | 	@PostAuthorize("returnObject.owner == authentication.name") (Allow if returned object is owned by user) |
  | @Secured	| Simpler check:Only allows users with any of the listed roles; does not use SpEL | 	@Secured("ROLE_ADMIN")                                                                                  |
-User must have "ROLE_ADMIN"
+
+
+
+|Annotation	| Applies to	| Checks for	| Allow ""?	 |Allow " "? |
+| ---------- | ------------- | ---------------- | ------------- | ------------ | 
+| @NotNull	| Any type	 | Not null	| Yes	| Yes |
+| @NotEmpty	| String/Col	| Not null, length > 0	| No	| Yes |
+| @NotBlank	| String	   | Not null, trimmed length > 0  | 	No	| No    |
+
+
 ### Quick Note
 - Validation annotations (@Email, @NotBlank, @Size) are typically placed on fields in DTO/model classes for automatic request validation.
 

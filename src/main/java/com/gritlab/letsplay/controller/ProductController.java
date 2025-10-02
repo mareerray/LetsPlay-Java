@@ -8,7 +8,7 @@
  import org.springframework.web.bind.annotation.*;
  import java.util.List;
  import org.springframework.security.core.Authentication;
- import javax.validation.Valid;
+ import jakarta.validation.Valid;
 
  @RestController
  @RequestMapping("/products")
@@ -48,13 +48,12 @@
          if (user == null) {
              throw new UnauthorizedException("User not authenticated.");
          }
-         String userId = user.getId();
 
          Product product = new Product();
          product.setName(input.getName());
          product.setDescription(input.getDescription());
          product.setPrice(input.getPrice());
-         product.setUserId(userId);
+         product.setUserId(user.getId());
 
          Product saved = productRepository.save(product);
          return toDTO(saved);
@@ -65,7 +64,7 @@
      @PutMapping("/{id}")
     public ProductDTO updateProduct(
             @PathVariable String id,
-            @Valid @RequestBody ProductInputDTO input,
+            @Valid @RequestBody ProductUpdateDTO input,
             Authentication auth) {
 
          Product product = productRepository.findById(id)
@@ -79,15 +78,31 @@
              throw new UnauthorizedException("User not authenticated.");
          }
 
-         // Allows the operation only if the authenticated user
-         // is either the owner of the product or an admin.
+         // Allows the owner of the product or an admin.
          if (!product.getUserId().equals(user.getId()) && !"admin".equalsIgnoreCase(user.getRole())) {
              throw new ForbiddenException("You don't have permission to modify this product.");
          }
 
-         product.setName(input.getName());
-         product.setDescription(input.getDescription());
-         product.setPrice(input.getPrice());
+         boolean updated = false;
+
+         if (input.getName() != null && !input.getName().isEmpty()) {
+             product.setName(input.getName());
+             updated = true;
+         }
+         if (input.getDescription() != null && !input.getDescription().isEmpty()) {
+             product.setDescription(input.getDescription());
+             updated = true;
+         }
+         if (input.getPrice() != null) {
+             product.setPrice(input.getPrice());
+             updated = true;
+         }
+         // Add more fields as needed
+
+         if (!updated) {
+             throw new IllegalArgumentException("No fields provided to update.");
+         }
+
          Product updatedProduct = productRepository.save(product);
          return toDTO(updatedProduct);
      }
