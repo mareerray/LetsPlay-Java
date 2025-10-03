@@ -1,67 +1,207 @@
 
-> Here’s a step-by-step plan to develop a basic CRUD RESTful API with Spring Boot and MongoDB for user and product management,including proper security and error handling measures as outlined.
+# LetsPlay Project
+RESTful CRUD API with Spring Boot & MongoDB
+### Author : [Mayuree Reunsati](https://github.com/mareerray)
 
-# Project Outline
-This application will feature user and product entities, provide RESTful CRUD endpoints, implement token-based authentication and authorization, and integrate security best practices for handling sensitive data and user interactions.
+### Table of Contents
+- [Objectives](#objectives)
+- [Features](#features)
+- [Setup & Running](#setup--running)
+- [Requirements](#requirements)
+- [Quickstart](#quickstart)
+- [API Endpoints](#api-endpoints)
+- [Authentication](#authentication)
+- [User Management](#user-management)
+- [Product Management](#product-management)
+- [Authentication & Authorization](#authentication--authorization)
+- [Security Measures](#security-measures)
+- [Error Handling](#error-handling)
+- [Testing & Auditing](#testing--auditing)
+- [Resources](#resources)
 
-## Database Design
-- User: Fields – id, name, email, password, role (admin/user)
+---
+## Objectives
+Develop a secure, robust, and RESTful CRUD API using Spring Boot and MongoDB.
+The app supports user management and product management with full authentication, authorization, error handling, and security controls.
 
-- Product: Fields – id, name, description, price, userId (owner)
+[Back to Table of Contents](#table-of-contents)
 
-- Relationship: One user owns many products (“User 1–n Product”).
+---
+## Features
+- User Management: Register, login, view/update/delete users, admin role support.
 
-## API Development
-- Implement CRUD endpoints for both users and products (Create, Read, Update, Delete).
+- Product Management: Create, read, update, delete products.
 
-- Ensure "GET Products" endpoint is accessible without authentication.
+- GET Products API is open (no authentication required).
 
-- Follow REST conventions for routes, resource URLs, and response status codes.
+- Role-Based Access Control: Only authorized users/admins can access protected resources.
 
+- Token-based Authentication: Powered by JWT (JSON Web Tokens).
+
+- Secure Password Storage: Hash/salt passwords before saving.
+
+- RESTful Principles: All endpoints and behaviors are consistent with REST conventions.
+
+- Comprehensive Error Handling: All errors are gracefully mapped to proper HTTP codes.
+
+[Back to Table of Contents](#table-of-contents)
+
+---
+## Setup & Running
+### Requirements
+- Java 17+
+
+- Maven
+
+- MongoDB (local or cloud/Atlas)
+
+- HTTPS-capable browser or API client (Postman, curl)
+
+### Quickstart
+### 1. Clone Repository
+
+````
+git clone <your-repo-url>
+cd letsplay-java
+````
+
+### 2. Configure MongoDB URI in application.properties
+````
+spring.application.name=letsplay
+spring.data.mongodb.uri=mongodb://localhost:27017/test
+spring.security.user.name=maire
+spring.security.user.password=maire123
+jwt.secret=your-very-secret-key
+
+server.ssl.enabled=true
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=password
+server.ssl.keyStoreType=PKCS12
+server.ssl.keyAlias=tomcat
+
+spring.mvc.throw-exception-if-no-handler-found=true
+spring.web.resources.add-mappings=false
+````
+### 3. Place your SSL keystore
+
+- Be sure keystore.p12 is present in src/main/resources
+
+- If you need one, generate with:
+
+````
+keytool -genkeypair -alias tomcat -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650
+````
+
+### 4. Build and Run
+
+````
+mvn spring-boot:run
+````
+
+- Access your API at: https://localhost:8080/
+
+(Note: Browsers and Postman may warn about untrusted or self-signed certificate; you can safely accept this for testing.)
+
+[Back to Table of Contents](#table-of-contents)
+
+---
+## API Endpoints
+### Authentication
+> POST /users/register
+
+- Register a new user
+
+- Required fields: name, email, password
+
+> POST /users/login
+
+- Authenticate and get JWT token
+
+- Required fields: email, password
+
+### User Management
+| Method	 | Endpoint	     | Auth Required	 | Description                   |
+|---------|---------------|----------------|-------------------------------|
+| GET     | 	/users/me    | 	Yes	          | Get own user profile          |
+| PUT	    | /users/me     | 	Yes           | 	Update own user info         |
+| DELETE  | 	/users/me    | 	Yes           | 	Delete own account           |
+| GET     | 	/users/      | 	Admin         | 	Get all users (admin only)   |
+| GET     | 	/users/{id}	 | Admin          | 	Get any user (admin only)    |
+| POST    | 	/users       | Admin          | 	Create new user (admin only) |
+| DELETE  | 	/users/{id}  | 	Admin         | 	Delete any user (admin only) |
+
+### Product Management
+| Method	 | Endpoint	       | Auth Required	 | Description                  |
+|---------|-----------------|----------------|------------------------------|
+| GET	    | /products	      | No	            | List all products            |
+| GET	    | /products/{id}  | No	            | Get single product           |
+| POST	   | /products	      | Yes	           | Create product               |
+| PUT	    | /products/{id}	 | Yes	           | Update product (owner/admin) |
+| DELETE  | /products/{id}	 | Yes	           | Delete product (owner/admin) |
+
+[Back to Table of Contents](#table-of-contents)
+
+---
 ## Authentication & Authorization
-- Integrate Spring Security for JWT (token-based) authentication.
+- Users authenticate using JWT tokens (supplied as Authorization: Bearer <token>)
 
-- Role-based authorization: limit certain APIs to admins or product owners; others accessible to ordinary users.
+- Role-based access:
 
-- Restrict access according to user roles, enforce permissions on endpoints.
+    - user role: Can access/modify own resources
 
-## Error Handling
-- Implement global exception handlers to catch and manage errors gracefully.
+    - admin role: Full access to all resources
 
-- Map exceptions to relevant HTTP status codes (e.g., 400, 401, 403, 404) and custom error messages.
+[Back to Table of Contents](#table-of-contents)
 
-- Prevent any 5XX errors by thorough validation and error management.
-
+---
 ## Security Measures
-- Password Handling: Hash & salt passwords before saving (use BCrypt or similar algorithm).
 
-- Input Validation: Validate and sanitize all inputs to prevent injection attacks on MongoDB.
+- All traffic uses HTTPS for security.
 
-- Sensitive Information: Never expose password or other private fields in API responses.
+- Passwords are hashed and salted using BCryptPasswordEncoder.
 
-- Enforce HTTPS for secure API calls; configure your environment accordingly.
+- Input validation: Strict validation with @Valid, custom DTOs.
 
-## Bonus Features
-- CORS: Configure Cross-Origin Resource Sharing to control allowed domains for API access.
+- No sensitive data (passwords, secrets) returned in any API response.
 
-- Rate Limiting: Add request rate limiting (e.g., via Bucket4j or Spring RateLimiter) to prevent brute-force attacks.
+[Back to Table of Contents](#table-of-contents)
 
-## Testing & Deployment
-- Validate endpoints for correct authentication/authorization and accurate CRUD functionality.
+---
+## Error Handling
+All errors are handled globally and consistently, with informative JSON responses and appropriate status codes.
 
-- Test that all security and error handling requirements are met, including the absence of 5XX errors.
+| Error/Condition       | 	HTTP Status	 | Example                                            |
+|-----------------------|---------------|----------------------------------------------------|
+| Not Found             | 	404	         | User/Product does not exist                        |
+| Unauthorized          | 	401          | 	JWT missing/invalid, login required               |
+| Forbidden             | 	403          | 	Accessing/changing another user’s product or info |
+| Conflict              | 	409          | 	Registering duplicate user or product             |
+| Validation Error      | 	400          | 	Missing/wrong fields                              |
+| Internal Server Error | 	500          | 	Unexpected bug/system error                       |
 
-- Provide clear run instructions or a startup script for auditors to launch and test the project.
+[Back to Table of Contents](#table-of-contents)
 
+---
+## Testing & Auditing
+- Automated tests for all endpoints and error scenarios recommended.
+
+- Auditors can run the project using Maven and test with Postman/curl as shown in the setup.
+
+- CORS, rate limiting, and additional features are available for further enhancement 
+and can be added for production deployments or advanced security policies.
+
+[Back to Table of Contents](#table-of-contents)
+
+---
 ## Resources
-- Use Spring Initializer to bootstrap the project.
+- Spring Initializer
 
-- Reference Github REST documentation for API conventions.
+- MongoDB Documentation
 
-## Security Notice – HTTPS Enforcement
+- Spring REST Docs
 
-This application only supports HTTPS connections out of the box, configured via the `application.properties`:
-- Keystore: `src/main/resources/keystore.p12`
-- SSL is enabled: `server.ssl.enabled=true`
+For questions or improvements, open an issue or contact the author.
 
-Use a valid, trusted certificate for any public deployment.  
+[Back to Table of Contents](#table-of-contents)
+
+---
