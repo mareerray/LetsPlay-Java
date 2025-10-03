@@ -153,7 +153,7 @@ public class UserController {
         User user = userRepository.findByEmail(userEmail);
 
         if (user == null) {
-            throw new ResourceNotFoundException("User profile not found for email: " + userEmail);
+            throw new ResourceNotFoundException("User not found.");
         }
         userRepository.deleteById(user.getId());
         return "User deleted";
@@ -214,7 +214,7 @@ public class UserController {
 
         Optional<User> userOpt = userRepository.findById(id);
         User user = userOpt
-                .orElseThrow(() -> new ResourceNotFoundException("User not found "));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         boolean updated = false;
 
@@ -251,7 +251,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable String id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
+            throw new ResourceNotFoundException("User not found.");
         }
 
         userRepository.deleteById(id);

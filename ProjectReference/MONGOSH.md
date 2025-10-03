@@ -55,3 +55,15 @@ Here are useful mongosh commands to help you find data easily in your MongoDB da
     
     
     db.users.find({}).limit(5)
+   
+6. MongoDB unique index
+- add a unique index:
+   Using the MongoDB shell or a GUI client, run:
+
+   ````
+   db.products.createIndex(
+   { name: 1, description: 1, price: 1 },
+   { unique: true }
+   )
+   ````
+This will prevent new inserts with the same name, description, and price (regardless of user or id).

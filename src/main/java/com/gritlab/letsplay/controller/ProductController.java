@@ -31,7 +31,7 @@
      @GetMapping("/{id}")
      public ProductDTO getProductById(@PathVariable String id) {
          Product product = productRepository.findById(id)
-                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                 .orElseThrow(() -> new ResourceNotFoundException("Product not found."));
          return toDTO(product);
      }
 
@@ -68,7 +68,7 @@
             Authentication auth) {
 
          Product product = productRepository.findById(id)
-                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                 .orElseThrow(() -> new ResourceNotFoundException("Product not found."));
 
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
@@ -114,7 +114,7 @@
             @PathVariable String id,
             Authentication auth) {
          Product product = productRepository.findById(id)
-                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                 .orElseThrow(() -> new ResourceNotFoundException("Product not found."));
 
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
