@@ -56,23 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-//    @Override
-//    protected boolean shouldNotFilter(HttpServletRequest request) {
-//        String method = request.getMethod();
-//        String path = request.getRequestURI();
-//        // Both POST and GET for login/register are public
-//        if ((method.equals("POST") || method.equals("GET")) &&
-//                (path.equals("/users/login") || path.equals("/users/register"))) {
-//            return true;
-//        }
-//        // All GET /products* EXCEPT /products/me is public
-//        if (method.equals("GET")
-//                && path.startsWith("/products")
-//                && !path.equals("/products/me")) {
-//            return true;
-//        }
-//        return false;
-//    }
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String method = request.getMethod();

@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -30,9 +28,13 @@ public class UserController {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
+    public record LoginResponseDTO(String token, String message) {
+    }
+    /*
+    The traditional Java class structure for above LoginResponseDTO
     public static class LoginResponseDTO {
-        private String token;
-        private String message;
+        private final String token;
+        private final String message;
 
         public LoginResponseDTO(String token, String message) {
             this.token = token;
@@ -41,6 +43,8 @@ public class UserController {
         public String getToken() { return token; }
         public String getMessage() { return message; }
     }
+     */
+
 
     // REGISTER endpoint ===================================================================== //
     @PostMapping("/register")
