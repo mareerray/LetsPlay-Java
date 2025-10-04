@@ -106,7 +106,7 @@ mvn spring-boot:run
 
 ---
 ## API Endpoints
-### Authentication
+### Authentication (No auth required)
 > POST /users/register
 
 - Register a new user
