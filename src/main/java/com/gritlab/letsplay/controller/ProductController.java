@@ -7,6 +7,8 @@
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.web.bind.annotation.*;
  import java.util.List;
+ import java.util.Optional;
+
  import org.springframework.security.core.Authentication;
  import jakarta.validation.Valid;
 
@@ -27,7 +29,7 @@
          return productRepository.findAll().stream().map(this::toDTO).toList();
      }
 
-     // GET single product (public)
+     // GET single product (public) / (404 Not Found if product does not exist)
      @GetMapping("/{id}")
      public ProductDTO getProductById(@PathVariable String id) {
          Product product = productRepository.findById(id)
@@ -36,18 +38,16 @@
      }
 
      // -------------------------- Need auth ------------------------------------------------- //
-     // === CREATE product === //
+     // === CREATE product (401 Unauthorized if user not authenticated) === //
      @PostMapping
      public ProductDTO createProduct(
              @Valid @RequestBody ProductInputDTO input,
              Authentication auth) {
          // Get email from JWT to ensure only the authenticated user can create product.
          String userEmail = auth.getName(); // usually the username/email
-         User user = userRepository.findByEmail(userEmail);
-
-         if (user == null) {
-             throw new UnauthorizedException("User not authenticated.");
-         }
+         Optional<User> userOpt = userRepository.findByEmail(userEmail);
+         User user = userOpt
+                 .orElseThrow(() -> new UnauthorizedException("User not authenticated."));
 
          Product product = new Product();
          product.setName(input.getName());
@@ -72,11 +72,9 @@
 
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
-         User user = userRepository.findByEmail(userEmail);
-
-         if (user == null) {
-             throw new UnauthorizedException("User not authenticated.");
-         }
+         Optional<User> userOpt = userRepository.findByEmail(userEmail);
+         User user = userOpt
+                 .orElseThrow(() -> new UnauthorizedException("User not authenticated."));
 
          boolean isOwner = product.getUserId().equals(user.getId());
          boolean isAdmin = "admin".equalsIgnoreCase(user.getRole());
@@ -129,11 +127,9 @@
 
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
-         User user = userRepository.findByEmail(userEmail);
-
-         if (user == null) {
-             throw new UnauthorizedException("User not authenticated.");
-         }
+         Optional<User> userOpt = userRepository.findByEmail(userEmail);
+         User user = userOpt
+                 .orElseThrow(() -> new UnauthorizedException("User not authenticated."));
 
          // Allows the operation only if the authenticated user
          // is either the owner of the product or an admin.
@@ -150,11 +146,9 @@
      public List<ProductDTO> getMyProducts(Authentication auth) {
          // Looks up the authenticated user by email and retrieves their id and role.
          String userEmail = auth.getName();
-         User user = userRepository.findByEmail(userEmail);
-
-         if (user == null) {
-             throw new UnauthorizedException("User not authenticated.");
-         }
+         Optional<User> userOpt = userRepository.findByEmail(userEmail);
+         User user = userOpt
+                 .orElseThrow(() -> new UnauthorizedException("User not authenticated."));
 
          List<Product> products = productRepository.findByUserId(user.getId());
          return  products.stream().map(this::toDTO).toList();
