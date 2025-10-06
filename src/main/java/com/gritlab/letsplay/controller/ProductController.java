@@ -78,8 +78,11 @@
              throw new UnauthorizedException("User not authenticated.");
          }
 
+         boolean isOwner = product.getUserId().equals(user.getId());
+         boolean isAdmin = "admin".equalsIgnoreCase(user.getRole());
+
          // Allows the owner of the product or an admin.
-         if (!product.getUserId().equals(user.getId()) && !"admin".equalsIgnoreCase(user.getRole())) {
+         if (!isOwner && !isAdmin) {
              throw new ForbiddenException("You don't have permission to modify this product.");
          }
 
@@ -97,7 +100,15 @@
              product.setPrice(input.getPrice());
              updated = true;
          }
-         // Add more fields as needed
+
+         // Allow admin to change ownership (userId)
+         if (isAdmin && input.getUserId() != null && !input.getUserId().isEmpty()
+                 && !input.getUserId().equals(product.getUserId())) {
+             User newOwner = userRepository.findById(input.getUserId())
+                     .orElseThrow(() -> new ResourceNotFoundException("New owner user not found."));
+             product.setUserId(newOwner.getId());
+             updated = true;
+         }
 
          if (!updated) {
              throw new IllegalArgumentException("No fields provided to update.");

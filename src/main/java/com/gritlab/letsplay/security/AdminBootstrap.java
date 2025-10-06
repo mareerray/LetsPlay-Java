@@ -13,6 +13,7 @@ public class AdminBootstrap {
     public CommandLineRunner ensureAdmin(UserRepository userRepository) {
         return args -> {
             if (userRepository.findByRole("admin").isEmpty()) {
+
                 User admin = new User();
                 admin.setName("SuperAdmin");
                 admin.setEmail("admin@example.com");

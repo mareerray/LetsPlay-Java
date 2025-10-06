@@ -14,6 +14,8 @@ public class ProductUpdateDTO {
     @DecimalMin("0.0")
     private Double price;
 
+    private String userId;
+
 
     // Getters
     public String getName () {
@@ -25,6 +27,10 @@ public class ProductUpdateDTO {
     public Double getPrice () {
         return price;
     }
+    public String getUserId () {
+        return userId;
+    }
+
 
     // Setters
     public void setName (String name) {
@@ -35,5 +41,8 @@ public class ProductUpdateDTO {
     }
     public void setPrice (Double price) {
         this.price = price;
+    }
+    public void setUserId (String userId) {
+        this.userId = userId;
     }
 }
