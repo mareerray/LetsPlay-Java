@@ -11,6 +11,7 @@
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/UserDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/UserLoginDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/UserRegistrationDTO.java
+/Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/model/UserUpdateDTO.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/repository/ProductRepository.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/repository/UserRepository.java
 /Users/mairereunsati/Desktop/LetsPlay-Java/src/main/java/com/gritlab/letsplay/security/AdminBootstrap.java

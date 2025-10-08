@@ -1,5 +1,6 @@
 com/gritlab/letsplay/exception/GlobalExceptionHandler$UserAlreadyExistsException.class
 com/gritlab/letsplay/repository/ProductRepository.class
+com/gritlab/letsplay/model/UserUpdateDTO.class
 com/gritlab/letsplay/model/ProductUpdateDTO.class
 com/gritlab/letsplay/exception/GlobalExceptionHandler$UnauthorizedException.class
 com/gritlab/letsplay/model/Product.class

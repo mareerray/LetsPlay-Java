@@ -60,21 +60,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String method = request.getMethod();
         String path = request.getRequestURI();
-        boolean skip = false;
+        boolean isPublic = false;
 
         // Both POST and GET for login/register are public
         if ((method.equals("POST") || method.equals("GET")) &&
                 (path.equals("/users/login") || path.equals("/users/register"))) {
-            skip = true;
+            isPublic = true;
         }
         // All GET /products* EXCEPT /products/me is public
         if (method.equals("GET")
                 && path.startsWith("/products")
                 && !path.equals("/products/me")) {
-            skip = true;
+            isPublic = true;
         }
 
-        System.out.println("[DEBUG][FILTER] method=" + method + ", path=" + path + ", skip=" + skip);
-        return skip;
+        System.out.println("[DEBUG][FILTER] method=" + method + ", path=" + path + ", isPublic=" + isPublic);
+        return isPublic;
     }
 }

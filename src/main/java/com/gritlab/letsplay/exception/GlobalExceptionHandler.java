@@ -1,5 +1,6 @@
 package com.gritlab.letsplay.exception;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -57,11 +58,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles malformed or missing JSON body errors.
+     * Handles malformed or missing JSON body errors, and unknown/forbidden fields (like "email" or "role").
      * Status: 400 Bad Request
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleNotReadable(HttpMessageNotReadableException ex) {
+        if (ex.getCause() instanceof UnrecognizedPropertyException cause) {
+            String fieldName = cause.getPropertyName();
+            String message = fieldName + " update is forbidden.";
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", message
+            ));
+        }
         return ResponseEntity.badRequest().body(Map.of(
                 "status", "error",
                 "message", "Malformed or missing request body"

@@ -112,8 +112,8 @@ public class UserController {
 
     // ---- UPDATE own profile (404 Not Found if not exist, 400 Bad Request if bad arguments) ---- //
     @PutMapping("/me")
-    public ResponseEntity<?> updateMyProfile(
-            @Valid @RequestBody UserRegistrationDTO userDTO,
+    public ResponseEntity<Object> updateMyProfile(
+            @Valid @RequestBody UserUpdateDTO userDTO,
             Authentication auth) {
 
         String userEmail = auth.getName(); // usually the username/email
@@ -130,19 +130,12 @@ public class UserController {
             updated = true;
         }
 
-        // Email updates through this endpoint are ignored; user email remains unchanged.
-
         // Only update password if present and not empty
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
             user.setPassword(hashedPassword);
             updated = true;
             passwordChanged = true;
-        }
-
-        // Forbid role change
-        if (userDTO.getRole() != null && !userDTO.getRole().isEmpty()) {
-            throw new IllegalArgumentException("Role update is not allowed.");
         }
 
         if (!updated) {
@@ -219,7 +212,7 @@ public class UserController {
     @PutMapping("/{id}")
     public UserDTO updateUser(
             @PathVariable String id,
-            @RequestBody UserDTO userDTO) {
+            @RequestBody UserUpdateDTO userDTO) {
 
         Optional<User> userOpt = userRepository.findById(id);
         User user = userOpt
@@ -233,14 +226,10 @@ public class UserController {
             updated = true;
         }
 
-        // Never change email through profile update (for safety)
-        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("Email update is not allowed.");
-        }
-
-        // Forbid role change
-        if (userDTO.getRole() != null && !userDTO.getRole().isEmpty()) {
-            throw new IllegalArgumentException("Role update is not allowed.");
+        // Only update password if provided
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            updated = true;
         }
 
         if (!updated) {
